@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><div class="card-header d-flex justify-content-between">
+  <span>Corrective-Action Recommendations</span>
+  <select id="filter" class="form-select form-select-sm w-auto" onchange="load()">
+    <option value="">All</option><option value="abstained">Abstained</option>
+    <option value="emitted">Emitted</option></select>
+</div><div class="card-body">
+  <table id="recs" class="table table-sm table-hover w-100"></table>
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const f=document.getElementById("filter").value;
+  let qs=""; if(f==="abstained")qs="?abstained=true"; if(f==="emitted")qs="?abstained=false";
+  const r=await api(`/api/recommendations${qs}`);
+  const t=$('#recs'); if($.fn.dataTable.isDataTable('#recs')) t.DataTable().destroy();
+  t.html(`<thead><tr><th>ID</th><th>Scenario</th><th>Summary</th><th>Status</th><th>Review</th><th>Backend</th><th>Latency</th><th></th></tr></thead>
+    <tbody>${r.recommendations.map(x=>`<tr><td>${x.id}</td><td>${x.scenario_id||''}</td>
+      <td>${(x.problem_summary||'').slice(0,60)}</td>
+      <td><span class="badge bg-${x.abstained?'warning text-dark':'success'}">${x.abstained?'abstained':'emitted'}</span></td>
+      <td>${x.review_status}</td><td class="small">${x.generator_backend||''}</td><td>${x.total_latency_ms}ms</td>
+      <td><a class="btn btn-sm btn-outline-primary" href="/recommendations/${x.id}">Open</a></td></tr>`).join("")}</tbody>`);
+  t.DataTable({order:[[0,'desc']], pageLength:12});
+}
+load();
+</script>
+{% endblock %}

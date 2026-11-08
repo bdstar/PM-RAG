@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4"><div class="card"><div class="card-header">New Experiment</div><div class="card-body">
+    <input id="e_name" class="form-control form-control-sm mb-2" placeholder="Experiment name">
+    <div class="row"><div class="col"><input id="e_rq" class="form-control form-control-sm mb-2" placeholder="RQ (e.g. RQ2)"></div>
+      <div class="col"><input id="e_hyp" class="form-control form-control-sm mb-2" placeholder="Hypothesis (e.g. H2)"></div></div>
+    <textarea id="e_desc" class="form-control form-control-sm mb-2" placeholder="Description"></textarea>
+    <button class="btn btn-sm btn-primary w-100" onclick="createExp()">Create</button>
+  </div></div>
+
+  <div class="card mt-3"><div class="card-header">Run a Baseline</div><div class="card-body">
+    <label class="form-label small">Experiment</label>
+    <select id="r_exp" class="form-select form-select-sm mb-2"></select>
+    <label class="form-label small">Baseline</label>
+    <select id="r_base" class="form-select form-select-sm mb-2"></select>
+    <div class="row"><div class="col"><label class="form-label small">Split</label>
+      <select id="r_split" class="form-select form-select-sm mb-2"><option value="test">test</option>
+        <option value="val">val</option><option value="train">train</option><option value="">all</option></select></div>
+      <div class="col"><label class="form-label small">Max scenarios</label>
+        <input id="r_max" type="number" class="form-control form-control-sm mb-2" value="20"></div></div>
+    <button class="btn btn-sm btn-success w-100" onclick="runExp()"><i class="bi bi-play"></i> Run</button>
+    <div id="run-status" class="mt-2"></div>
+    <p class="small text-muted mt-2 mb-0">Tip: build the benchmark (Datasets → step 4) before running.</p>
+  </div></div></div>
+
+  <div class="col-lg-8"><div class="card"><div class="card-header">Experiments &amp; Runs</div>
+    <div class="card-body" id="exp-list"></div></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadBaselines(){
+  const r=await api("/api/experiments/baselines");
+  document.getElementById("r_base").innerHTML = r.baselines.map(b=>`<option value="${b.name}">${b.label}</option>`).join("");
+}
+async function loadExps(){
+  const r=await api("/api/experiments");
+  document.getElementById("r_exp").innerHTML = r.experiments.map(e=>`<option value="${e.id}">${e.name}</option>`).join("");
+  document.getElementById("exp-list").innerHTML = r.experiments.length?r.experiments.map(e=>`
+    <div class="evidence-item"><b>${e.name}</b> <span class="badge bg-secondary">${e.research_question||''}</span>
+      <span class="badge bg-info text-dark">${e.hypothesis||''}</span>
+      <div class="small">${e.runs.map(run=>`<span class="badge bg-${run.status==='completed'?'success':run.status==='failed'?'danger':'secondary'}">
+        ${run.baseline} #${run.id} (${run.status}, n=${run.num_scenarios})</span>`).join(' ')||'no runs'}</div>
+      <a class="small" href="/research-results">view results →</a></div>`).join("")
+    : '<div class="empty-state">No experiments yet.</div>';
+}
+async function createExp(){
+  await api("/api/experiments",{method:"POST",body:JSON.stringify({
+    name:document.getElementById("e_name").value, research_question:document.getElementById("e_rq").value,
+    hypothesis:document.getElementById("e_hyp").value, description:document.getElementById("e_desc").value})});
+  showAlert("Experiment created","success"); loadExps();
+}
+async function runExp(){
+  const eid=document.getElementById("r_exp").value;
+  if(!eid){ showAlert("Create/select an experiment first","warning"); return; }
+  const body={baseline:document.getElementById("r_base").value, split:document.getElementById("r_split").value||null,
+    max_scenarios:+document.getElementById("r_max").value||null};
+  document.getElementById("run-status").innerHTML='<div class="alert alert-info py-2"><span class="spin"></span> running…</div>';
+  const {job_id}=await api(`/api/experiments/${eid}/run`,{method:"POST",body:JSON.stringify(body)});
+  const j=await pollJob(job_id, jj=>document.getElementById("run-status").innerHTML=
+    `<div class="alert alert-info py-2"><span class="spin"></span> ${jj.message||'running'}…</div>`);
+  document.getElementById("run-status").innerHTML=`<div class="alert alert-success py-2">Run complete: ${JSON.stringify(j.result)}</div>`;
+  loadExps();
+}
+loadBaselines(); loadExps();
+</script>
+{% endblock %}

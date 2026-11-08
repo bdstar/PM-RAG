@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card mb-3"><div class="card-header d-flex justify-content-between">
+  <span>Scenarios</span>
+  <div>
+    <select id="ptype" class="form-select form-select-sm d-inline-block w-auto">
+      <option value="">All types</option>
+      <option>schedule_delay</option><option>forecast_deterioration</option>
+      <option>budget_variance</option><option>repeated_forecast_revision</option>
+      <option>insufficient_evidence</option></select>
+    <select id="origin" class="form-select form-select-sm d-inline-block w-auto">
+      <option value="">All origins</option><option>rule_generated</option>
+      <option>manual</option><option>expert_validated</option></select>
+    <button class="btn btn-sm btn-outline-primary" onclick="load()">Filter</button>
+    <button class="btn btn-sm btn-secondary" onclick="detect()"><i class="bi bi-magic"></i> Detect</button>
+    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#newModal"><i class="bi bi-plus"></i> New</button>
+  </div>
+</div><div class="card-body"><div id="job"></div>
+  <table id="scenarios" class="table table-sm table-hover w-100"></table></div></div>
+
+<div class="modal fade" id="newModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">New Scenario</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div class="mb-2"><label class="form-label">Problem type</label>
+      <input id="n_ptype" class="form-control" value="schedule_delay"></div>
+    <div class="mb-2"><label class="form-label">Title</label><input id="n_title" class="form-control"></div>
+    <div class="mb-2"><label class="form-label">Description</label><textarea id="n_desc" class="form-control"></textarea></div>
+    <div class="row"><div class="col"><label class="form-label">Project ID</label><input id="n_pid" type="number" class="form-control"></div>
+      <div class="col"><label class="form-label">Reporting period (YYYYMM)</label><input id="n_period" class="form-control"></div></div>
+    <div class="form-check mt-2"><input id="n_bench" class="form-check-input" type="checkbox"><label class="form-check-label">Include in benchmark</label></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-primary" onclick="create()">Create</button></div>
+</div></div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const pt=document.getElementById("ptype").value, og=document.getElementById("origin").value;
+  const r=await api(`/api/scenarios?limit=500&problem_type=${pt}&origin=${og}`);
+  const t=$('#scenarios'); if($.fn.dataTable.isDataTable('#scenarios')) t.DataTable().destroy();
+  t.html(`<thead><tr><th>Key</th><th>Type</th><th>Title</th><th>Period</th><th>Severity</th><th>Origin</th><th>Evidence</th><th>Bench</th><th></th></tr></thead>
+    <tbody>${r.scenarios.map(s=>`<tr><td class="mono">${s.scenario_key}</td><td>${s.problem_type}</td>
+      <td>${s.title}</td><td>${s.reporting_period||''}</td>
+      <td><span class="badge bg-${s.severity==='High'?'danger':s.severity==='Medium'?'warning text-dark':'secondary'}">${s.severity}</span></td>
+      <td><span class="badge bg-${s.origin==='expert_validated'?'success':s.origin==='manual'?'info text-dark':'secondary'}">${s.origin}</span></td>
+      <td>${s.evidence_sufficient_label===null?'—':(s.evidence_sufficient_label?'sufficient':'insufficient')}</td>
+      <td>${s.include_in_benchmark?`<span class="badge bg-primary">${s.split||'yes'}</span>`:''}</td>
+      <td><button class="btn btn-sm btn-outline-primary" onclick="location.href='/rag-workbench?scenario_id=${s.id}'">Analyze</button></td></tr>`).join("")}</tbody>`);
+  t.DataTable({pageLength:12});
+}
+async function detect(){ document.getElementById("job").innerHTML='<div class="alert alert-info py-2"><span class="spin"></span> detecting…</div>';
+  const {job_id}=await api("/api/scenarios/detect",{method:"POST",body:"{}"});
+  const j=await pollJob(job_id); document.getElementById("job").innerHTML=`<div class="alert alert-success py-2">${JSON.stringify(j.result)}</div>`; load(); }
+async function create(){
+  const body={problem_type:document.getElementById("n_ptype").value, title:document.getElementById("n_title").value,
+    description:document.getElementById("n_desc").value, project_id:+document.getElementById("n_pid").value||null,
+    reporting_period:document.getElementById("n_period").value||null, include_in_benchmark:document.getElementById("n_bench").checked};
+  await api("/api/scenarios",{method:"POST",body:JSON.stringify(body)});
+  bootstrap.Modal.getInstance("#newModal").hide(); load(); showAlert("Scenario created","success");
+}
+load();
+</script>
+{% endblock %}

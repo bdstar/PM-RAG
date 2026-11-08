@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h5>Experiment Results <small class="text-muted">(computed from stored runs only)</small></h5>
+  <a class="btn btn-sm btn-outline-success" href="/api/research-results/export"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+<div id="empty" class="empty-state" style="display:none">
+  No completed experiment runs yet. Create and run an experiment to populate these charts.
+  No placeholder scores are shown.
+</div>
+<div id="charts">
+<div class="row g-3">
+  <div class="col-lg-6"><div class="card"><div class="card-header">Retrieval: Recall@k &amp; nDCG@k</div>
+    <div class="card-body"><div class="chart-box"><canvas id="retrChart"></canvas></div></div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-header">Attribution &amp; Factual Consistency</div>
+    <div class="card-body"><div class="chart-box"><canvas id="groundChart"></canvas></div></div></div></div>
+</div>
+<div class="row g-3 mt-1">
+  <div class="col-lg-6"><div class="card"><div class="card-header">Abstention</div>
+    <div class="card-body"><div class="chart-box"><canvas id="abstChart"></canvas></div></div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-header">Efficiency (latency)</div>
+    <div class="card-body"><div class="chart-box"><canvas id="effChart"></canvas></div></div></div></div>
+</div>
+<div class="card mt-3"><div class="card-header">Run Comparison Matrix</div>
+  <div class="card-body" id="matrix"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const summary = await api("/api/research-results/summary");
+  if(!summary.num_runs){ document.getElementById("empty").style.display="block";
+    document.getElementById("charts").style.display="none"; return; }
+
+  const retr = (await api("/api/research-results/retrieval")).metrics;
+  const ground = (await api("/api/research-results/grounding")).metrics;
+  const abst = (await api("/api/research-results/abstention")).metrics;
+  const eff = (await api("/api/research-results/efficiency")).metrics;
+
+  const runs = Object.keys(retr);
+  // Retrieval chart: recall@5 and ndcg@5 per run
+  barChart(document.getElementById("retrChart"), runs, [
+    {label:"Recall@5", data:runs.map(r=>retr[r]["recall@5"]?.value||0), backgroundColor:PALETTE[0]},
+    {label:"nDCG@5", data:runs.map(r=>retr[r]["ndcg@5"]?.value||0), backgroundColor:PALETTE[1]},
+    {label:"MRR", data:runs.map(r=>retr[r]["mrr"]?.value||0), backgroundColor:PALETTE[2]},
+  ], {scales:{y:{max:1}}});
+
+  const gruns = Object.keys(ground);
+  barChart(document.getElementById("groundChart"), gruns, [
+    {label:"Supported rate", data:gruns.map(r=>ground[r]["supported_rate"]?.value||0), backgroundColor:PALETTE[6]},
+    {label:"Unsupported rate", data:gruns.map(r=>ground[r]["unsupported_rate"]?.value||0), backgroundColor:PALETTE[5]},
+    {label:"Attribution F1", data:gruns.map(r=>ground[r]["attribution_f1"]?.value||0), backgroundColor:PALETTE[3]},
+  ], {scales:{y:{max:1}}});
+
+  const aruns = Object.keys(abst);
+  if(aruns.length) barChart(document.getElementById("abstChart"), aruns, [
+    {label:"Abstention rate", data:aruns.map(r=>abst[r]["abstention_rate"]?.value||0), backgroundColor:PALETTE[4]},
+    {label:"Abstention precision", data:aruns.map(r=>abst[r]["abstention_precision"]?.value||0), backgroundColor:PALETTE[0]},
+  ], {scales:{y:{max:1}}});
+
+  const eruns = Object.keys(eff);
+  if(eruns.length) barChart(document.getElementById("effChart"), eruns, [
+    {label:"Mean total ms", data:eruns.map(r=>eff[r]["mean_total_ms"]?.value||0), backgroundColor:PALETTE[7]},
+  ]);
+
+  // Matrix
+  const cmp = await api(`/api/experiments/compare?run_ids=${summary.runs.map(s=>s.run_id).join(',')}`);
+  const metrics = Object.keys(cmp.matrix);
+  const cols = cmp.runs.map(r=>`${r.baseline}#${r.run_id}`);
+  document.getElementById("matrix").innerHTML = `<table class="table table-sm table-bordered"><thead><tr><th>Metric</th>
+    ${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>
+    ${metrics.map(mn=>`<tr><td>${mn}</td>${cols.map(c=>`<td>${fmt(cmp.matrix[mn][c])}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+load().catch(e=>showAlert(e.message,"danger"));
+</script>
+{% endblock %}

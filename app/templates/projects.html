@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card mb-3"><div class="card-body">
+  <div class="row g-2">
+    <div class="col-md-5"><input id="q" class="form-control" placeholder="Search project key / PID / name"></div>
+    <div class="col-md-3"><input id="phase" class="form-control" placeholder="Phase (optional)"></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" onclick="load()">Search</button></div>
+  </div>
+</div></div>
+<div class="card"><div class="card-body">
+  <table id="projects" class="table table-sm table-hover w-100"></table>
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load() {
+  const q = document.getElementById("q").value;
+  const phase = document.getElementById("phase").value;
+  const r = await api(`/api/projects?limit=300&q=${encodeURIComponent(q)}&phase=${encodeURIComponent(phase)}`);
+  const t = $('#projects');
+  if ($.fn.dataTable.isDataTable('#projects')) t.DataTable().destroy();
+  t.html(`<thead><tr><th>ID</th><th>Project Key</th><th>PID</th><th>Name</th><th>Agency</th><th>Phase</th><th>Borough</th></tr></thead>
+    <tbody>${r.projects.map(p=>`<tr style="cursor:pointer" onclick="location.href='/projects/${p.id}'">
+      <td>${p.id}</td><td class="mono">${p.project_key}</td><td>${p.pid||''}</td>
+      <td>${p.name||''}</td><td>${p.managing_agency||''}</td><td>${p.phase||''}</td><td>${p.borough||''}</td></tr>`).join("")}</tbody>`);
+  t.DataTable({pageLength:15});
+  showAlert(`Showing ${r.projects.length} of ${r.total} projects`, "info");
+}
+load();
+</script>
+{% endblock %}

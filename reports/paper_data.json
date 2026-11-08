@@ -1,0 +1,2397 @@
+{
+  "datasets": [
+    {
+      "id": 1,
+      "type": "citywide_budget_schedule",
+      "name": "Capital Projects Dashboard - Citywide Budget and Schedule",
+      "source_url": "https://catalog.data.gov/dataset/capital-projects-dashboard-citywide-budget-and-schedule",
+      "evidence_category": "observed"
+    },
+    {
+      "id": 2,
+      "type": "budget_spend_history",
+      "name": "Capital Projects Dashboard - Citywide Budget Spend History and Variance",
+      "source_url": "https://catalog.data.gov/dataset/capital-projects-dashboard-citywide-budget-spend-history-and-variance",
+      "evidence_category": "observed"
+    },
+    {
+      "id": 3,
+      "type": "schedule_history",
+      "name": "Capital Projects Dashboard - Citywide Schedule History and Variance",
+      "source_url": "https://catalog.data.gov/dataset/capital-projects-dashboard-citywide-schedule-history-and-variance",
+      "evidence_category": "observed"
+    }
+  ],
+  "counts": {
+    "budget_schedule": 56525,
+    "schedule_history": 22464,
+    "budget_history": 53495,
+    "projects": 11840,
+    "fms_mappings": 8179,
+    "execution_events": 30686,
+    "scenarios": 12719,
+    "evidence_documents": 132488,
+    "evidence_chunks": 132489,
+    "scenario_evidence": 27566
+  },
+  "period_ranges": {
+    "budget_schedule": [
+      "202305",
+      "202605"
+    ],
+    "schedule_history": [
+      "202305",
+      "202605"
+    ],
+    "budget_history": [
+      "200609",
+      "202605"
+    ]
+  },
+  "unique": {
+    "projects": 11840,
+    "fms_in_mappings": 8179
+  },
+  "scenario_types_all": {
+    "budget_variance": 3440,
+    "forecast_deterioration": 1525,
+    "insufficient_evidence": 4893,
+    "repeated_forecast_revision": 1259,
+    "schedule_delay": 1602
+  },
+  "scenario_types_test": {
+    "budget_variance": 522,
+    "forecast_deterioration": 215,
+    "insufficient_evidence": 738,
+    "repeated_forecast_revision": 171,
+    "schedule_delay": 225
+  },
+  "split_counts": {
+    "test": 1871,
+    "train": 8971,
+    "val": 1877
+  },
+  "data_quality": [],
+  "experiment": {
+    "id": 2,
+    "name": "PM-RAG benchmark campaign (N=100)",
+    "research_question": "RQ1-6: retrieval quality, attribution, grounding, abstention, ef",
+    "hypothesis": "H1-5: hybrid+rerank retrieval and grounding/abstention improve e"
+  },
+  "runs": [
+    {
+      "run_id": 9,
+      "baseline": "no_retrieval_llm",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_recall",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.0590909,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 220,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.940909,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 220,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.559091,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 220,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.2,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 867.55,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 1061.82,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 56.5068,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 10,
+      "baseline": "keyword_template",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.035,
+          "ci_low": 0.005,
+          "ci_high": 0.075
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.085,
+          "ci_low": 0.035,
+          "ci_high": 0.135
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.165,
+          "ci_low": 0.105,
+          "ci_high": 0.225
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0133333,
+          "ci_low": 0.00333333,
+          "ci_high": 0.0266667
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.022,
+          "ci_low": 0.01,
+          "ci_high": 0.034
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.03,
+          "ci_low": 0.02,
+          "ci_high": 0.04125
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.019375,
+          "ci_low": 0.00306574,
+          "ci_high": 0.041638
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.0421511,
+          "ci_low": 0.0176533,
+          "ci_high": 0.0673553
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.0729813,
+          "ci_low": 0.046772,
+          "ci_high": 0.100873
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.0507262,
+          "ci_low": 0.032131,
+          "ci_high": 0.0704405
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 16,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.11875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.88125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.0125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.238095,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.84,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 1859.28,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 2470.87,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 24.2829,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 11,
+      "baseline": "bm25_only",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.035,
+          "ci_low": 0.005,
+          "ci_high": 0.075
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.085,
+          "ci_low": 0.035,
+          "ci_high": 0.135
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.165,
+          "ci_low": 0.105,
+          "ci_high": 0.225
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0133333,
+          "ci_low": 0.00333333,
+          "ci_high": 0.0266667
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.022,
+          "ci_low": 0.01,
+          "ci_high": 0.034
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.03,
+          "ci_low": 0.02,
+          "ci_high": 0.04125
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.019375,
+          "ci_low": 0.00306574,
+          "ci_high": 0.041638
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.0421511,
+          "ci_low": 0.0176533,
+          "ci_high": 0.0673553
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.0729813,
+          "ci_low": 0.046772,
+          "ci_high": 0.100873
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.0507262,
+          "ci_low": 0.032131,
+          "ci_high": 0.0704405
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 16,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.11875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.88125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.0125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.238095,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.84,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 2068.28,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 2727.73,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 21.9963,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 12,
+      "baseline": "dense_only",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 54,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.427184,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 309,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.572816,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 309,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.213592,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 309,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.391304,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 0.9,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 0.9,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.1,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.46,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 1231.79,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 1740.38,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 34.4752,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 13,
+      "baseline": "hybrid_no_rerank",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.01,
+          "ci_low": 0.0,
+          "ci_high": 0.03
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.035,
+          "ci_low": 0.005,
+          "ci_high": 0.075
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.07,
+          "ci_low": 0.025,
+          "ci_high": 0.115
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.00333333,
+          "ci_low": 0.0,
+          "ci_high": 0.01
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.008,
+          "ci_low": 0.002,
+          "ci_high": 0.016
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.01125,
+          "ci_low": 0.005,
+          "ci_high": 0.0175
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.005,
+          "ci_low": 0.0,
+          "ci_high": 0.015
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.015109,
+          "ci_low": 0.00237198,
+          "ci_high": 0.032334
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.0277976,
+          "ci_low": 0.0103282,
+          "ci_high": 0.0463985
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.0162976,
+          "ci_low": 0.00619048,
+          "ci_high": 0.027631
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 16,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.0,
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.11875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.88125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.0125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.238095,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.84,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 1734.55,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 2305.59,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 26.0237,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 14,
+      "baseline": "pm_rag_full",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.1,
+          "ci_low": 0.055,
+          "ci_high": 0.155
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.2,
+          "ci_low": 0.14,
+          "ci_high": 0.265
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.205,
+          "ci_low": 0.145,
+          "ci_high": 0.27
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.245,
+          "ci_low": 0.175,
+          "ci_high": 0.315
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0933333,
+          "ci_low": 0.0666667,
+          "ci_high": 0.123333
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.058,
+          "ci_low": 0.04,
+          "ci_high": 0.076
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.04375,
+          "ci_low": 0.0325,
+          "ci_high": 0.055
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.173125,
+          "ci_low": 0.118928,
+          "ci_high": 0.233454
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.175766,
+          "ci_low": 0.122216,
+          "ci_high": 0.235976
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.191257,
+          "ci_low": 0.137056,
+          "ci_high": 0.249867
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.215357,
+          "ci_low": 0.152619,
+          "ci_high": 0.288095
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0962963,
+          "ci_low": 0.0518519,
+          "ci_high": 0.140741,
+          "sample_size": 45,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.095,
+          "ci_low": 0.05,
+          "ci_high": 0.145,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_f1",
+          "value": 0.446154,
+          "ci_low": 0.423077,
+          "ci_high": 0.469231,
+          "sample_size": 13,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.38125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.61875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.290625,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.363636,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.55,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 3197.26,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 3729.84,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 16.0865,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 15,
+      "baseline": "nearest_historical_case",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.572897,
+          "ci_low": 0.501437,
+          "ci_high": 0.65254
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.78369,
+          "ci_low": 0.726512,
+          "ci_high": 0.84319
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.78369,
+          "ci_low": 0.726512,
+          "ci_high": 0.84319
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.78369,
+          "ci_low": 0.726512,
+          "ci_high": 0.84319
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.9,
+          "ci_low": 0.84,
+          "ci_high": 0.96
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.621667,
+          "ci_low": 0.561667,
+          "ci_high": 0.68
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.621667,
+          "ci_low": 0.561667,
+          "ci_high": 0.68
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.621667,
+          "ci_low": 0.561667,
+          "ci_high": 0.68
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.9,
+          "ci_low": 0.84,
+          "ci_high": 0.96
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.901169,
+          "ci_low": 0.857446,
+          "ci_high": 0.942118
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.845715,
+          "ci_low": 0.801194,
+          "ci_high": 0.888638
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.812209,
+          "ci_low": 0.765871,
+          "ci_high": 0.860965
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.941667,
+          "ci_low": 0.905,
+          "ci_high": 0.976667
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.617216,
+          "ci_low": 0.553114,
+          "ci_high": 0.675824,
+          "sample_size": 91,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.70769,
+          "ci_low": 0.640845,
+          "ci_high": 0.778119,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_f1",
+          "value": 0.614272,
+          "ci_low": 0.572365,
+          "ci_high": 0.650888,
+          "sample_size": 90,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.703125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.296875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.121875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.09,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 199.16,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 483.88,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 123.998,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 16,
+      "baseline": "rule_based_alerts",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.622897,
+          "ci_low": 0.562433,
+          "ci_high": 0.69254
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.622897,
+          "ci_low": 0.562433,
+          "ci_high": 0.69254
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.622897,
+          "ci_low": 0.562433,
+          "ci_high": 0.69254
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.622897,
+          "ci_low": 0.562433,
+          "ci_high": 0.69254
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.835,
+          "ci_low": 0.785,
+          "ci_high": 0.88
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.835,
+          "ci_low": 0.785,
+          "ci_high": 0.88
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.835,
+          "ci_low": 0.785,
+          "ci_high": 0.88
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.739115,
+          "ci_low": 0.700429,
+          "ci_high": 0.786432
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.713091,
+          "ci_low": 0.667961,
+          "ci_high": 0.765476
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.697368,
+          "ci_low": 0.646857,
+          "ci_high": 0.75422
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 1.0,
+          "ci_low": 1.0,
+          "ci_high": 1.0
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.835,
+          "ci_low": 0.785,
+          "ci_high": 0.88,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.622897,
+          "ci_low": 0.562433,
+          "ci_high": 0.69254,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_f1",
+          "value": 0.630914,
+          "ci_low": 0.577379,
+          "ci_high": 0.686364,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 740.18,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 745.96,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 80.4333,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 17,
+      "baseline": "pm_rag_no_grounding",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.1,
+          "ci_low": 0.055,
+          "ci_high": 0.155
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.2,
+          "ci_low": 0.14,
+          "ci_high": 0.265
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.205,
+          "ci_low": 0.145,
+          "ci_high": 0.27
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.245,
+          "ci_low": 0.175,
+          "ci_high": 0.315
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0933333,
+          "ci_low": 0.0666667,
+          "ci_high": 0.123333
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.058,
+          "ci_low": 0.04,
+          "ci_high": 0.076
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.04375,
+          "ci_low": 0.0325,
+          "ci_high": 0.055
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.173125,
+          "ci_low": 0.118928,
+          "ci_high": 0.233454
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.175766,
+          "ci_low": 0.122216,
+          "ci_high": 0.235976
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.191257,
+          "ci_low": 0.137056,
+          "ci_high": 0.249867
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.215357,
+          "ci_low": 0.152619,
+          "ci_high": 0.288095
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0933333,
+          "ci_low": 0.0666667,
+          "ci_high": 0.123333,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.2,
+          "ci_low": 0.14,
+          "ci_high": 0.265,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_f1",
+          "value": 0.442857,
+          "ci_low": 0.425,
+          "ci_high": 0.460714,
+          "sample_size": 28,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 2760.52,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 2768.69,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 21.6709,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 18,
+      "baseline": "pm_rag_no_abstention",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.1,
+          "ci_low": 0.055,
+          "ci_high": 0.155
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.2,
+          "ci_low": 0.14,
+          "ci_high": 0.265
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.205,
+          "ci_low": 0.145,
+          "ci_high": 0.27
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.245,
+          "ci_low": 0.175,
+          "ci_high": 0.315
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0933333,
+          "ci_low": 0.0666667,
+          "ci_high": 0.123333
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.058,
+          "ci_low": 0.04,
+          "ci_high": 0.076
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.04375,
+          "ci_low": 0.0325,
+          "ci_high": 0.055
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.173125,
+          "ci_low": 0.118928,
+          "ci_high": 0.233454
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.175766,
+          "ci_low": 0.122216,
+          "ci_high": 0.235976
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.191257,
+          "ci_low": 0.137056,
+          "ci_high": 0.249867
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.215357,
+          "ci_low": 0.152619,
+          "ci_high": 0.288095
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0933333,
+          "ci_low": 0.0666667,
+          "ci_high": 0.123333,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.2,
+          "ci_low": 0.14,
+          "ci_high": 0.265,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_f1",
+          "value": 0.442857,
+          "ci_low": 0.425,
+          "ci_high": 0.460714,
+          "sample_size": 28,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.38125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.61875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.290625,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_recall",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 3777.24,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 4364.13,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 13.7484,
+          "unit": "rec/min"
+        }
+      ]
+    },
+    {
+      "run_id": 19,
+      "baseline": "pm_rag_no_citation",
+      "num_scenarios": 100,
+      "retrieval": [
+        {
+          "name": "recall",
+          "k": 1,
+          "value": 0.1,
+          "ci_low": 0.055,
+          "ci_high": 0.155
+        },
+        {
+          "name": "recall",
+          "k": 3,
+          "value": 0.2,
+          "ci_low": 0.14,
+          "ci_high": 0.265
+        },
+        {
+          "name": "recall",
+          "k": 5,
+          "value": 0.205,
+          "ci_low": 0.145,
+          "ci_high": 0.27
+        },
+        {
+          "name": "recall",
+          "k": 8,
+          "value": 0.245,
+          "ci_low": 0.175,
+          "ci_high": 0.315
+        },
+        {
+          "name": "precision",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "precision",
+          "k": 3,
+          "value": 0.0933333,
+          "ci_low": 0.0666667,
+          "ci_high": 0.123333
+        },
+        {
+          "name": "precision",
+          "k": 5,
+          "value": 0.058,
+          "ci_low": 0.04,
+          "ci_high": 0.076
+        },
+        {
+          "name": "precision",
+          "k": 8,
+          "value": 0.04375,
+          "ci_low": 0.0325,
+          "ci_high": 0.055
+        },
+        {
+          "name": "ndcg",
+          "k": 1,
+          "value": 0.14,
+          "ci_low": 0.08,
+          "ci_high": 0.21
+        },
+        {
+          "name": "ndcg",
+          "k": 3,
+          "value": 0.173125,
+          "ci_low": 0.118928,
+          "ci_high": 0.233454
+        },
+        {
+          "name": "ndcg",
+          "k": 5,
+          "value": 0.175766,
+          "ci_low": 0.122216,
+          "ci_high": 0.235976
+        },
+        {
+          "name": "ndcg",
+          "k": 8,
+          "value": 0.191257,
+          "ci_low": 0.137056,
+          "ci_high": 0.249867
+        },
+        {
+          "name": "mrr",
+          "k": null,
+          "value": 0.215357,
+          "ci_low": 0.152619,
+          "ci_high": 0.288095
+        }
+      ],
+      "recommendation": [
+        {
+          "name": "attribution_precision",
+          "value": 0.0962963,
+          "ci_low": 0.0518519,
+          "ci_high": 0.140741,
+          "sample_size": 45,
+          "note": null
+        },
+        {
+          "name": "attribution_recall",
+          "value": 0.095,
+          "ci_low": 0.05,
+          "ci_high": 0.145,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "attribution_f1",
+          "value": 0.446154,
+          "ci_low": 0.423077,
+          "ci_high": 0.469231,
+          "sample_size": 13,
+          "note": null
+        },
+        {
+          "name": "supported_rate",
+          "value": 0.38125,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "unsupported_rate",
+          "value": 0.61875,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "contradiction_rate",
+          "value": 0.290625,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 320,
+          "note": "over all factual claims"
+        },
+        {
+          "name": "abstention_precision",
+          "value": 0.363636,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_recall",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_evidence_insufficient_detection_rate",
+          "value": 1.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_inappropriate_recommendation_rate",
+          "value": 0.0,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        },
+        {
+          "name": "abstention_rate",
+          "value": 0.55,
+          "ci_low": null,
+          "ci_high": null,
+          "sample_size": 100,
+          "note": null
+        }
+      ],
+      "performance": [
+        {
+          "name": "mean_retrieval_ms",
+          "value": 3428.39,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_generation_ms",
+          "value": 0.0,
+          "unit": "ms"
+        },
+        {
+          "name": "mean_total_ms",
+          "value": 3959.39,
+          "unit": "ms"
+        },
+        {
+          "name": "throughput_per_min",
+          "value": 15.1538,
+          "unit": "rec/min"
+        }
+      ]
+    }
+  ],
+  "reproducibility": {
+    "python": "3.14.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "embed_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embed_backend": "sentence-transformers/all-MiniLM-L6-v2",
+    "reranker_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "generator_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "llm_backend": "stub",
+    "prompt_version": "pmrag-gen-v1",
+    "index_version": "1632d558541b",
+    "dataset_checksums": {
+      "Citywide Budget and Schedule.csv": "cd6e8d9ca518d5d2b6687ecb21ac5098ead195c1dce299a704bda5d8b6cc5d90",
+      "Citywide Budget Spend History and Variance.csv": "98ae5fd6c0dbb322cb8bec4e920067323b7e13863f7b3ffa1100d7a7c06d52c9",
+      "Citywide Schedule History and Variance.csv": "207497de0875631794dec067e32b9a4a309cba03c356ab4ead29bc19eaa9a006"
+    },
+    "config": {
+      "label": "No-retrieval LLM",
+      "enabled_retrievers": [],
+      "retrieval_mode": "hybrid_temporal",
+      "reranker_enabled": false,
+      "citation_enabled": false,
+      "grounding_enabled": true,
+      "abstention_enabled": false,
+      "description": "LLM/SLM with no retrieved evidence (expected: more unsupported claims)."
+    },
+    "random_seed": 42,
+    "timestamp": "2026-11-06T05:13:19.863853+00:00"
+  },
+  "examples": [
+    {
+      "result_id": 127,
+      "run_id": 10,
+      "scenario_id": 1498,
+      "problem_summary": "4 distinct forecast completion dates observed.",
+      "evidence_summary": "According to record citywide_budget_schedule:43800, fms id is SANDQ14EL; pid is 94; reporting period is 202509.",
+      "abstained": false,
+      "action": "Investigate the pattern of repeated forecast revisions and review the reliability of the schedule forecasting process.",
+      "category": "Project-status investigation",
+      "priority": "Medium",
+      "responsible_role": "Planning Manager",
+      "requires_human_approval": false,
+      "retrieval_latency_ms": 1763,
+      "total_latency_ms": 2311,
+      "citations": [
+        {
+          "cited_id": "citywide_budget_schedule:43800",
+          "valid": true
+        },
+        {
+          "cited_id": "citywide_budget_schedule:1329",
+          "valid": true
+        },
+        {
+          "cited_id": "schedule_history:2094",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "result_id": 136,
+      "run_id": 10,
+      "scenario_id": 2324,
+      "problem_summary": "4 distinct forecast completion dates observed.",
+      "evidence_summary": "According to record citywide_budget_schedule:43800, fms id is SANDQ14EL; pid is 94; reporting period is 202509.",
+      "abstained": false,
+      "action": "Investigate the pattern of repeated forecast revisions and review the reliability of the schedule forecasting process.",
+      "category": "Project-status investigation",
+      "priority": "Medium",
+      "responsible_role": "Planning Manager",
+      "requires_human_approval": false,
+      "retrieval_latency_ms": 1909,
+      "total_latency_ms": 2455,
+      "citations": [
+        {
+          "cited_id": "citywide_budget_schedule:43800",
+          "valid": true
+        },
+        {
+          "cited_id": "citywide_budget_schedule:1329",
+          "valid": true
+        },
+        {
+          "cited_id": "schedule_history:2094",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "result_id": 150,
+      "run_id": 10,
+      "scenario_id": 897,
+      "problem_summary": "4 distinct forecast completion dates observed.",
+      "evidence_summary": "According to record citywide_budget_schedule:43800, fms id is SANDQ14EL; pid is 94; reporting period is 202509.",
+      "abstained": false,
+      "action": "Investigate the pattern of repeated forecast revisions and review the reliability of the schedule forecasting process.",
+      "category": "Project-status investigation",
+      "priority": "Medium",
+      "responsible_role": "Planning Manager",
+      "requires_human_approval": false,
+      "retrieval_latency_ms": 2036,
+      "total_latency_ms": 2581,
+      "citations": [
+        {
+          "cited_id": "citywide_budget_schedule:43800",
+          "valid": true
+        },
+        {
+          "cited_id": "citywide_budget_schedule:1329",
+          "valid": true
+        },
+        {
+          "cited_id": "schedule_history:2094",
+          "valid": true
+        }
+      ]
+    },
+    {
+      "result_id": 26,
+      "run_id": 9,
+      "scenario_id": 5438,
+      "abstained": true,
+      "abstention_reason": "No relevant evidence available at the decision date."
+    }
+  ]
+}

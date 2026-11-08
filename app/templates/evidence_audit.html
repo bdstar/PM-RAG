@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="text-muted">Every generated claim, its citation, the source record, the NLI result, and whether the
+source supports the claim. This view is the core evidence-grounding audit.</p>
+<div class="mb-2"><button class="btn btn-sm btn-outline-primary" onclick="load()">Refresh</button></div>
+<div id="audit"><span class="spin"></span> loading…</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const list = await api("/api/recommendations?limit=15");
+  const container = document.getElementById("audit");
+  if(!list.recommendations.length){ container.innerHTML='<div class="empty-state">No recommendations generated yet.</div>'; return; }
+  const parts = [];
+  for(const rec of list.recommendations){
+    const r = await api(`/api/recommendations/${rec.id}`);
+    const evMap = {}; (r.retrieved_evidence||[]).forEach(e=>evMap[e.chunk_key]=e.text);
+    parts.push(`<div class="card mb-2"><div class="card-header d-flex justify-content-between">
+      <span>Recommendation #${r.id} ${r.abstained?'<span class="badge bg-warning text-dark">abstained</span>':''}</span>
+      <a href="/recommendations/${r.id}" class="small">open</a></div>
+      <div class="card-body">
+      <table class="table table-sm"><thead><tr><th>Claim</th><th>NLI</th><th>Supported?</th></tr></thead><tbody>
+      ${(r.grounding||[]).map(g=>`<tr><td class="small">${g.claim}</td>
+        <td><span class="badge bg-${g.label==='entailment'?'success':g.label==='contradiction'?'danger':'secondary'}">${g.label} ${fmt(g.score)}</span></td>
+        <td>${g.supported?'<span class="supported">✔</span>':'<span class="unsupported">✖</span>'}</td></tr>`).join("")||'<tr><td colspan=3 class="text-muted">No factual claims checked.</td></tr>'}
+      </tbody></table>
+      <div class="small"><b>Citations:</b> ${(r.citations||[]).map(c=>`<span class="mono ${c.resolves&&c.temporally_valid?'supported':'unsupported'}">${c.cited_source_id}${c.temporally_valid?'':'(future!)'}</span>`).join(', ')||'none'}</div>
+      </div></div>`);
+  }
+  container.innerHTML = parts.join("");
+}
+load().catch(e=>showAlert(e.message,"danger"));
+</script>
+{% endblock %}

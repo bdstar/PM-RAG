@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="content"><span class="spin"></span> loading…</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const RID = {{ recommendation_id }};
+async function load(){
+  const r = await api(`/api/recommendations/${RID}`);
+  document.getElementById("content").innerHTML = `
+  <div class="card mb-3"><div class="card-body">
+    <h5>${r.problem_summary||'Recommendation #'+r.id}</h5>
+    <span class="badge bg-${r.abstained?'warning text-dark':'success'}">${r.abstained?'Abstained':'Emitted'}</span>
+    <span class="badge bg-secondary">review: ${r.review_status}</span>
+    <span class="badge bg-info text-dark">${r.generator_backend||''}</span>
+    <p class="small mt-2">${r.evidence_summary||''}</p>
+    ${r.abstained?`<div class="alert alert-warning">${r.abstention_reason||''}</div>`:''}
+    ${(r.limitations||[]).length?`<div class="small text-muted">Limitations: ${r.limitations.join('; ')}</div>`:''}
+  </div></div>
+
+  <div class="row g-3">
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Recommended Actions</div><div class="card-body">
+      ${r.actions.length?r.actions.map(a=>`<div class="evidence-item"><b>${a.action}</b>
+        <div class="small"><span class="badge bg-dark">${a.category||''}</span>
+          <span class="badge bg-danger">${a.priority}</span>
+          <span class="badge bg-secondary">${a.responsible_role||''}</span>
+          ${a.requires_human_approval?'<span class="badge bg-warning text-dark">approval required</span>':''}</div>
+        <div class="small mt-1"><i>Rationale:</i> ${a.rationale||''}</div>
+        <div class="small"><i>Expected impact:</i> ${a.expected_impact||'—'}</div>
+        <div class="small"><i>Cites:</i> ${(a.supporting_evidence_ids||[]).map(x=>`<span class="mono">${x}</span>`).join(', ')}</div>
+        ${(a.assumptions||[]).length?`<div class="small text-muted"><i>Assumptions:</i> ${a.assumptions.join('; ')}</div>`:''}
+        </div>`).join(""):'<div class="empty-state">No actions (abstained).</div>'}
+    </div></div></div>
+
+    <div class="col-lg-6"><div class="card h-100"><div class="card-header">Grounding &amp; Citations</div><div class="card-body">
+      <h6 class="small">Citations</h6>
+      ${r.citations.length?r.citations.map(c=>`<div class="small ${c.resolves&&c.temporally_valid?'supported':'unsupported'}">
+        ${c.resolves&&c.temporally_valid?'✔':'✖'} <span class="mono">${c.cited_source_id}</span>
+        ${c.temporally_valid?'':' (future-dated!)'}</div>`).join(""):'<div class="text-muted small">none</div>'}
+      <h6 class="small mt-3">Grounding (NLI)</h6>
+      ${r.grounding.length?r.grounding.map(g=>`<div class="small ${g.supported?'supported':(g.label==='contradiction'?'unsupported':'neutral')}">
+        ${g.supported?'✔':g.label==='contradiction'?'✖':'○'} ${g.claim.slice(0,90)} (${g.label} ${fmt(g.score)}) <span class="text-muted">[${g.method}]</span></div>`).join(""):'<div class="text-muted small">none</div>'}
+    </div></div></div>
+  </div>
+
+  <div class="card mt-3"><div class="card-header">Evidence Used</div><div class="card-body">
+    ${(r.retrieved_evidence||[]).map(e=>`<div class="evidence-item"><span class="mono">${e.chunk_key}</span>
+      <span class="small text-muted">· ${e.dataset_type} · period ${e.reporting_period||'—'}</span>
+      <pre>${(e.text||'').slice(0,350)}</pre></div>`).join("")||'<div class="text-muted">none</div>'}
+  </div></div>
+
+  <div class="card mt-3"><div class="card-header">Human Review (required for consequential actions)</div><div class="card-body">
+    <div class="btn-group mb-2">
+      <button class="btn btn-sm btn-success" onclick="review('accept')">Accept</button>
+      <button class="btn btn-sm btn-warning" onclick="review('edit')">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="review('reject')">Reject</button>
+      <button class="btn btn-sm btn-info text-white" onclick="review('request_evidence')">Request more evidence</button>
+      <button class="btn btn-sm btn-secondary" onclick="review('insufficient')">Mark insufficient</button>
+    </div>
+    <textarea id="notes" class="form-control form-control-sm mb-2" placeholder="Review notes"></textarea>
+    <div id="review-history">${r.reviews.map(rv=>`<div class="small">· <b>${rv.decision}</b> by ${rv.reviewer} ${rv.notes?('— '+rv.notes):''}</div>`).join("")}</div>
+  </div></div>`;
+}
+async function review(decision){
+  const notes=document.getElementById("notes").value;
+  await api(`/api/recommendations/${RID}/review`,{method:"POST",body:JSON.stringify({decision, notes})});
+  showAlert(`Recorded: ${decision}`,"success"); load();
+}
+load().catch(e=>showAlert(e.message,"danger"));
+</script>
+{% endblock %}

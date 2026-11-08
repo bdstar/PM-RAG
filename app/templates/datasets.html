@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Pipeline Controls</span>
+    <div>
+      <button class="btn btn-sm btn-outline-primary" onclick="discover()"><i class="bi bi-search"></i> Discover CSVs</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3"><label class="form-label small">Rows per file (blank = all)</label>
+        <input id="limit" type="number" class="form-control form-control-sm" placeholder="e.g. 3000"></div>
+      <div class="col-md-9">
+        <button class="btn btn-sm btn-primary" onclick="ingestAll()"><i class="bi bi-upload"></i> 1. Import all discovered</button>
+        <button class="btn btn-sm btn-secondary" onclick="runAnalysis()"><i class="bi bi-gear"></i> 2. Run analysis + scenarios</button>
+        <button class="btn btn-sm btn-success" onclick="rebuildIndex()"><i class="bi bi-hdd-stack"></i> 3. Build evidence index</button>
+        <button class="btn btn-sm btn-info text-white" onclick="buildBenchmark()"><i class="bi bi-list-check"></i> 4. Build benchmark</button>
+      </div>
+    </div>
+    <div id="job-status" class="mt-3"></div>
+    <p class="text-muted small mt-2 mb-0">Source CSV files are never modified. Re-import is idempotent (safe).</p>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">Discovered Files &amp; Automatic Classification</div>
+  <div class="card-body"><div id="discovery"><div class="empty-state">Click “Discover CSVs”.</div></div></div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">Imported Datasets</div>
+  <div class="card-body"><div id="datasets-list"></div></div>
+</div>
+
+<div class="card">
+  <div class="card-header">Ingestion Runs</div>
+  <div class="card-body"><table id="runs" class="table table-sm table-striped w-100"></table></div>
+</div>
+
+<!-- Inspect modal -->
+<div class="modal fade" id="inspectModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable">
+  <div class="modal-content"><div class="modal-header"><h5 class="modal-title">Schema &amp; Quality</h5>
+    <button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body" id="inspect-body"></div></div></div></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function jobBox(msg){ document.getElementById("job-status").innerHTML =
+  `<div class="alert alert-info py-2 mb-0"><span class="spin"></span> ${msg}</div>`; }
+function jobDone(msg){ document.getElementById("job-status").innerHTML =
+  `<div class="alert alert-success py-2 mb-0">${msg}</div>`; }
+
+async function runJob(startPromise, label) {
+  jobBox(`${label}…`);
+  const {job_id} = await startPromise;
+  const job = await pollJob(job_id, j => jobBox(`${label}: ${j.message||''} (${j.processed}/${j.total||'?'})`));
+  jobDone(`${label} complete. ${JSON.stringify(job.result).slice(0,300)}`);
+  return job;
+}
+
+async function discover() {
+  document.getElementById("discovery").innerHTML = '<span class="spin"></span> scanning…';
+  const r = await api("/api/datasets/discover", {method:"POST", body:"{}"});
+  if (!r.items.length) { document.getElementById("discovery").innerHTML =
+    `<div class="empty-state">No CSVs found in ${r.directory}</div>`; return; }
+  document.getElementById("discovery").innerHTML = r.items.map(it => it.error ?
+    `<div class="alert alert-warning">${it.file}: ${it.error}</div>` :
+    `<div class="evidence-item d-flex justify-content-between align-items-center">
+      <div><b>${it.file}</b> · ${fmt(it.row_count)} rows · ${it.column_count} cols
+        <br><span class="badge bg-primary">${it.dataset_type}</span>
+        <span class="badge bg-${it.confidence>0.6?'success':'warning'}">conf ${fmt(it.confidence)}</span>
+        ${(it.warnings||[]).map(w=>`<span class="badge bg-danger" title="${w}">warning</span>`).join(' ')}</div>
+      <button class="btn btn-sm btn-outline-secondary" onclick='inspect(${JSON.stringify(it.file_path)}, ${JSON.stringify(it.dataset_type)})'>Inspect</button>
+    </div>`).join("");
+}
+
+async function inspect(path, dtype) {
+  const body = document.getElementById("inspect-body");
+  body.innerHTML = '<span class="spin"></span> inspecting…';
+  new bootstrap.Modal("#inspectModal").show();
+  const r = await api("/api/datasets/inspect", {method:"POST", body: JSON.stringify({file_path:path, dataset_type:dtype})});
+  const cols = r.profile.columns.map(c=>`<tr><td>${c.name}</td><td>${c.inferred_type}</td>
+    <td>${fmt(c.null_pct)}%</td><td>${fmt(c.unique_count)}</td><td>${c.is_identifier?'✔':''}</td></tr>`).join("");
+  body.innerHTML = `<p>Classification: <b>${r.classification.dataset_type}</b> (conf ${fmt(r.classification.confidence)})</p>
+    ${(r.quality.warnings||[]).map(w=>`<div class="alert alert-warning py-1">${w}</div>`).join("")}
+    <table class="table table-sm"><thead><tr><th>Column</th><th>Type</th><th>Null%</th><th>Unique</th><th>ID</th></tr></thead>
+    <tbody>${cols}</tbody></table>`;
+}
+
+async function ingestAll() {
+  const limit = document.getElementById("limit").value || null;
+  await runJob(api("/api/datasets/ingest",{method:"POST",body:JSON.stringify({all_discovered:true, limit:limit?+limit:null})}),"Importing");
+  loadDatasets(); loadRuns();
+}
+async function runAnalysis(){ const limit=document.getElementById("limit").value||null;
+  await runJob(api("/api/analysis/run",{method:"POST",body:JSON.stringify({limit:limit?+limit:null})}),"Analysis"); }
+async function rebuildIndex(){ const limit=document.getElementById("limit").value||null;
+  await runJob(api("/api/index/rebuild",{method:"POST",body:JSON.stringify({limit_per_type:limit?+limit:null, rebuild:true})}),"Indexing"); }
+async function buildBenchmark(){ await runJob(api("/api/scenarios/benchmark/build",{method:"POST",body:"{}"}),"Benchmark"); }
+
+async function loadDatasets() {
+  const r = await api("/api/datasets");
+  document.getElementById("datasets-list").innerHTML = r.datasets.length ? r.datasets.map(d=>`
+    <div class="evidence-item"><b>${d.name}</b> <span class="badge bg-secondary">${d.dataset_type}</span>
+    <span class="badge bg-info text-dark">${d.evidence_category}</span>
+    ${d.files.map(f=>`<div class="small text-muted mono">${f.file_name} — ${fmt(f.row_count)} rows, ${f.column_count} cols, sha ${f.checksum}
+      <a href="#" onclick='showProfile(${d.id});return false'>profile</a></div>`).join("")}</div>`).join("")
+    : '<div class="empty-state">No datasets imported.</div>';
+}
+async function showProfile(id){ const r=await api(`/api/datasets/${id}/profile`);
+  const body=document.getElementById("inspect-body"); new bootstrap.Modal("#inspectModal").show();
+  body.innerHTML = r.files.map(f=>`<h6>${f.file}</h6>${(f.quality?.warnings||[]).map(w=>`<div class="alert alert-warning py-1">${w}</div>`).join("")}
+    <table class="table table-sm"><thead><tr><th>Column</th><th>Type</th><th>Null%</th><th>Unique</th></tr></thead><tbody>
+    ${f.columns.map(c=>`<tr><td>${c.name}</td><td>${c.type}</td><td>${fmt(c.null_pct)}%</td><td>${fmt(c.unique)}</td></tr>`).join("")}</tbody></table>`).join(""); }
+
+async function loadRuns() {
+  const r = await api("/api/datasets/ingestion-runs");
+  const table = $('#runs');
+  if ($.fn.dataTable.isDataTable('#runs')) table.DataTable().destroy();
+  table.html(`<thead><tr><th>ID</th><th>Status</th><th>Total</th><th>OK</th><th>Failed</th><th>Skipped</th><th>Finished</th></tr></thead>
+    <tbody>${r.runs.map(x=>`<tr><td>${x.id}</td><td>${x.status}</td><td>${fmt(x.rows_total)}</td>
+    <td>${fmt(x.rows_succeeded)}</td><td>${fmt(x.rows_failed)}</td><td>${fmt(x.rows_skipped)}</td>
+    <td>${x.finished_at||''}</td></tr>`).join("")}</tbody>`);
+  table.DataTable({order:[[0,'desc']], pageLength:5});
+}
+loadDatasets(); loadRuns();
+</script>
+{% endblock %}

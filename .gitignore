@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Environment
+.env
+
+# RAG storage (vector DB is rebuilt from the knowledge base)
+storage/
+
+# Hugging Face / model caches
+.cache/
+*.bin
+
+# Logs
+*.log
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+.cursor/

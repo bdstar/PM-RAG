@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-7"><div class="card"><div class="card-header">Current Configuration</div>
+    <div class="card-body" id="config"><span class="spin"></span></div></div></div>
+  <div class="col-lg-5"><div class="card"><div class="card-header">Connection Tests</div>
+    <div class="card-body"><button class="btn btn-sm btn-primary mb-2" onclick="test()"><i class="bi bi-plug"></i> Run tests</button>
+      <div id="tests"></div></div></div>
+    <div class="card mt-3"><div class="card-body small text-muted">
+      Settings are managed via the <span class="mono">.env</span> file and environment variables
+      (credentials are never hard-coded). Edit <span class="mono">.env</span> and restart the server to change
+      the dataset directory, database, vector store, embedding/reranker/NLI models, or LLM provider.
+    </div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const s=await api("/api/system/status");
+  document.getElementById("config").innerHTML=`<table class="table table-sm">
+    <tr><th>Dataset dir</th><td class="mono">${s.paths.dataset_dir}</td></tr>
+    <tr><th>Storage dir</th><td class="mono">${s.paths.storage_dir}</td></tr>
+    <tr><th>ChromaDB dir</th><td class="mono">${s.paths.chroma_dir}</td></tr>
+    <tr><th>Database</th><td>${s.database.backend} (${s.database.url})</td></tr>
+    <tr><th>Vector store</th><td>${s.vector_store.backend} · ${fmt(s.vector_store.count)} vectors</td></tr>
+    <tr><th>Embedding model</th><td class="mono">${s.models.embed_model}</td></tr>
+    <tr><th>Reranker model</th><td class="mono">${s.models.reranker_model}</td></tr>
+    <tr><th>NLI model</th><td class="mono">${s.models.nli_model}</td></tr>
+    <tr><th>LLM backend</th><td>${s.models.llm_backend} · ${s.models.llm_model}</td></tr></table>`;
+}
+async function test(){
+  document.getElementById("tests").innerHTML='<span class="spin"></span> testing…';
+  const s=await api("/api/system/status");
+  const row=(n,ok,d)=>`<div class="mb-1"><span class="badge bg-${ok?'success':'danger'}">${ok?'OK':'FAIL'}</span> ${n} <span class="small text-muted">${d}</span></div>`;
+  document.getElementById("tests").innerHTML =
+    row("Database", s.database.ok, s.database.backend) +
+    row("Vector store", s.vector_store.backend!=='', `${s.vector_store.backend}, ${fmt(s.vector_store.count)} vectors`) +
+    row("LLM provider", true, `${s.models.llm_backend} (falls back to evidence-only stub if unavailable)`);
+}
+load();
+</script>
+{% endblock %}

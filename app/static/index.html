@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AquaTech RAG Assistant</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #121c2e;
+    --panel-2: #18253b;
+    --border: #243349;
+    --text: #e7eefb;
+    --muted: #93a4c0;
+    --accent: #19b6c9;
+    --accent-2: #2f6df6;
+    --good: #2fbf71;
+    --warn: #f0a83a;
+    --bad: #ef5d6b;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(1200px 600px at 80% -10%, #15314a 0%, var(--bg) 55%);
+    color: var(--text); min-height: 100vh;
+  }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px; border-bottom: 1px solid var(--border);
+    background: rgba(11,18,32,.7); backdrop-filter: blur(8px);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center; font-size: 20px;
+  }
+  .brand h1 { font-size: 18px; margin: 0; }
+  .brand p { margin: 0; font-size: 12px; color: var(--muted); }
+  .status { display: flex; gap: 16px; font-size: 12px; color: var(--muted); align-items: center; flex-wrap: wrap; }
+  .pill { padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--panel); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--muted); }
+  .dot.ok { background: var(--good); } .dot.bad { background: var(--bad); }
+
+  main { max-width: 920px; margin: 0 auto; padding: 24px 20px 120px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 8px 0 18px; }
+
+  .examples { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .chip {
+    cursor: pointer; font-size: 13px; padding: 8px 12px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+    transition: .15s;
+  }
+  .chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+  #chat { display: flex; flex-direction: column; gap: 16px; }
+  .msg { display: flex; gap: 12px; }
+  .msg .avatar { width: 32px; height: 32px; border-radius: 8px; flex: none; display: grid; place-items: center; font-size: 14px; }
+  .msg.user .avatar { background: var(--accent-2); }
+  .msg.bot .avatar { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  .bubble { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; flex: 1; }
+  .msg.user .bubble { background: var(--panel-2); }
+  .answer { line-height: 1.55; white-space: pre-wrap; }
+
+  .badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .badge { font-size: 11.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); }
+  .badge.good { color: var(--good); border-color: rgba(47,191,113,.4); background: rgba(47,191,113,.08); }
+  .badge.warn { color: var(--warn); border-color: rgba(240,168,58,.4); background: rgba(240,168,58,.08); }
+  .badge.bad  { color: var(--bad);  border-color: rgba(239,93,107,.4); background: rgba(239,93,107,.08); }
+  .badge.info { color: var(--muted); }
+
+  details.sources { margin-top: 12px; border-top: 1px dashed var(--border); padding-top: 10px; }
+  details.sources summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+  .src { margin-top: 10px; font-size: 12.5px; color: var(--muted); border-left: 2px solid var(--border); padding: 4px 0 4px 12px; }
+  .src .score { color: var(--accent); font-weight: 600; }
+
+  .composer {
+    position: fixed; bottom: 0; left: 0; right: 0; padding: 16px 20px;
+    background: linear-gradient(0deg, var(--bg) 60%, transparent);
+  }
+  .composer-inner { max-width: 920px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
+  textarea {
+    flex: 1; resize: none; min-height: 52px; max-height: 160px; padding: 14px 16px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-size: 14px; font-family: inherit;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  button.send {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white;
+    border: none; border-radius: var(--radius); padding: 0 22px; height: 52px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button.send:disabled { opacity: .5; cursor: not-allowed; }
+  .tools { display: flex; gap: 8px; align-items: center; }
+  .ghost { background: var(--panel); color: var(--muted); border: 1px solid var(--border); border-radius: 10px; height: 52px; padding: 0 14px; cursor: pointer; }
+  .ghost:hover { border-color: var(--accent); color: var(--text); }
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; display: inline-block; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; top: 80px; right: 20px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 13px; opacity: 0; transition: .3s; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">AT</div>
+    <div>
+      <h1>AquaTech RAG Assistant</h1>
+      <p>Grounded answers from the Employee Policy knowledge base</p>
+    </div>
+  </div>
+  <div class="status" id="status">
+    <span class="pill"><span class="dot" id="health-dot"></span><span id="health-text">connecting…</span></span>
+    <span class="pill" id="chunks-pill">chunks: –</span>
+    <span class="pill" id="llm-pill">llm: –</span>
+  </div>
+</header>
+
+<main>
+  <p class="hint">Ask about AquaTech's employee policies. The assistant only answers from the
+  indexed documents and will say <em>"I don't know"</em> when information is not in the knowledge base.</p>
+
+  <div class="examples" id="examples"></div>
+
+  <div id="chat"></div>
+</main>
+
+<div class="composer">
+  <div class="composer-inner">
+    <div class="tools">
+      <button class="ghost" id="reindex" title="Rebuild the vector index">↻ Re-index</button>
+      <label class="ghost" title="Upload a PDF/TXT to the knowledge base" style="display:grid;place-items:center;">
+        ⬆ Upload
+        <input type="file" id="upload" accept=".pdf,.txt,.md" hidden />
+      </label>
+    </div>
+    <textarea id="input" placeholder="e.g. How many remote work days are allowed per week?" rows="1"></textarea>
+    <button class="send" id="send">Ask</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EXAMPLES = [
+  "How many days a week can employees work remotely?",
+  "How much is the home office setup stipend?",
+  "How many free therapy sessions are covered per year?",
+  "How many PTO days do employees get annually?",
+  "What is AquaTech's policy on cryptocurrency bonuses?"
+];
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
+const toast = document.getElementById("toast");
+
+function showToast(msg) {
+  toast.textContent = msg; toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2600);
+}
+
+function renderExamples() {
+  const box = document.getElementById("examples");
+  EXAMPLES.forEach(q => {
+    const c = document.createElement("div");
+    c.className = "chip"; c.textContent = q;
+    c.onclick = () => { input.value = q; ask(); };
+    box.appendChild(c);
+  });
+}
+
+function addUser(text) {
+  const el = document.createElement("div");
+  el.className = "msg user";
+  el.innerHTML = `<div class="avatar">🧑</div><div class="bubble"><div class="answer"></div></div>`;
+  el.querySelector(".answer").textContent = text;
+  chat.appendChild(el); scrollDown();
+}
+
+function addBotLoading() {
+  const el = document.createElement("div");
+  el.className = "msg bot";
+  el.innerHTML = `<div class="avatar">💧</div><div class="bubble"><div class="answer"><span class="spinner"></span> Retrieving & generating…</div></div>`;
+  chat.appendChild(el); scrollDown();
+  return el;
+}
+
+function renderResult(el, data) {
+  const grounded = data.grounded;
+  const badgeClass = grounded ? "good" : "bad";
+  const statusLabel = grounded ? "✔ Grounded" : "⚠ Not in knowledge base";
+  const guardrail = data.guardrail_triggered
+    ? `<span class="badge warn">🛡 Guardrail triggered</span>` : "";
+  const sources = (data.sources || []).map(s => `
+      <div class="src"><span class="score">[${s.rank}] sim=${s.score}</span> · ${s.source}<br>${escapeHtml(s.text).slice(0, 400)}${s.text.length>400?'…':''}</div>
+    `).join("");
+
+  el.querySelector(".bubble").innerHTML = `
+    <div class="answer">${escapeHtml(data.answer)}</div>
+    <div class="badges">
+      <span class="badge ${badgeClass}">${statusLabel}</span>
+      <span class="badge info">confidence: ${data.confidence}</span>
+      ${guardrail}
+      <span class="badge info">${data.latency_ms} ms · ${escapeHtml(data.backend)}</span>
+    </div>
+    ${sources ? `<details class="sources"><summary>${data.sources.length} retrieved source chunk(s)</summary>${sources}</details>` : ""}
+  `;
+  scrollDown();
+}
+
+function escapeHtml(s) {
+  return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function scrollDown() { window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }
+
+async function ask() {
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = ""; autoSize();
+  addUser(q);
+  const botEl = addBotLoading();
+  sendBtn.disabled = true;
+  try {
+    const res = await fetch("/api/query", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ query: q })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({detail: res.statusText}));
+      throw new Error(err.detail || "Request failed");
+    }
+    renderResult(botEl, await res.json());
+  } catch (e) {
+    botEl.querySelector(".answer").innerHTML = `<span style="color:var(--bad)">Error: ${escapeHtml(e.message)}</span>`;
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+async function refreshHealth() {
+  try {
+    const r = await fetch("/api/health");
+    const h = await r.json();
+    document.getElementById("health-dot").className = "dot " + (h.index_ready ? "ok" : "bad");
+    document.getElementById("health-text").textContent = h.index_ready ? "ready" : "not indexed";
+    document.getElementById("chunks-pill").textContent = "chunks: " + h.chunks_indexed;
+    document.getElementById("llm-pill").textContent = "llm: " + h.llm_backend;
+  } catch {
+    document.getElementById("health-dot").className = "dot bad";
+    document.getElementById("health-text").textContent = "offline";
+  }
+}
+
+document.getElementById("reindex").onclick = async () => {
+  showToast("Re-indexing knowledge base…");
+  try {
+    const r = await fetch("/api/ingest", { method: "POST" });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail);
+    showToast(`Indexed ${d.chunks_indexed} chunks from ${d.documents_loaded} doc(s).`);
+    refreshHealth();
+  } catch (e) { showToast("Re-index failed: " + e.message); }
+};
+
+document.getElementById("upload").onchange = async (ev) => {
+  const file = ev.target.files[0]; if (!file) return;
+  showToast("Uploading & indexing " + file.name + "…");
+  const fd = new FormData(); fd.append("file", file);
+  try {
+    const r = await fetch("/api/upload", { method: "POST", body: fd });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail);
+    showToast(`Indexed ${d.chunks_indexed} chunks.`);
+    refreshHealth();
+  } catch (e) { showToast("Upload failed: " + e.message); }
+};
+
+function autoSize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 160) + "px"; }
+input.addEventListener("input", autoSize);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
+});
+sendBtn.onclick = ask;
+
+renderExamples();
+refreshHealth();
+setInterval(refreshHealth, 15000);
+</script>
+</body>
+</html>

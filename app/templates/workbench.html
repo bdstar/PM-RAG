@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-3">
+    <div class="card"><div class="card-header">Configuration</div><div class="card-body">
+      <label class="form-label small">Scenario ID</label>
+      <input id="scenario_id" class="form-control form-control-sm mb-2">
+      <label class="form-label small">Project ID</label>
+      <input id="project_id" class="form-control form-control-sm mb-2">
+      <label class="form-label small">As-of period (YYYYMM)</label>
+      <input id="as_of" class="form-control form-control-sm mb-2">
+      <label class="form-label small">Problem type</label>
+      <input id="problem_type" class="form-control form-control-sm mb-2" value="schedule_delay">
+      <label class="form-label small">Problem description</label>
+      <textarea id="problem" class="form-control form-control-sm mb-2" rows="2"></textarea>
+      <label class="form-label small">Retrieval mode</label>
+      <select id="mode" class="form-select form-select-sm mb-2">
+        <option value="hybrid_temporal">Hybrid temporal</option>
+        <option value="current_project">Current project</option>
+        <option value="same_project_historical">Same-project historical</option>
+        <option value="cross_project">Cross-project</option></select>
+      <label class="form-label small">Top-k: <span id="kval">8</span></label>
+      <input id="topk" type="range" min="1" max="20" value="8" class="form-range" oninput="kval.textContent=this.value">
+      <div class="form-check form-check-sm"><input id="rerank" class="form-check-input" type="checkbox" checked><label class="form-check-label small">Reranker</label></div>
+      <div class="form-check form-check-sm"><input id="citation" class="form-check-input" type="checkbox" checked><label class="form-check-label small">Citation check</label></div>
+      <div class="form-check form-check-sm"><input id="grounding" class="form-check-input" type="checkbox" checked><label class="form-check-label small">Grounding (NLI)</label></div>
+      <div class="form-check form-check-sm mb-2"><input id="abstention" class="form-check-input" type="checkbox" checked><label class="form-check-label small">Abstention</label></div>
+      <button class="btn btn-sm btn-outline-secondary w-100 mb-1" onclick="searchEvidence()"><i class="bi bi-search"></i> Retrieve evidence</button>
+      <button class="btn btn-sm btn-primary w-100" onclick="generate()"><i class="bi bi-lightbulb"></i> Generate recommendation</button>
+    </div></div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card h-100"><div class="card-header">Retrieved Evidence <small class="text-muted">(not model reasoning)</small></div>
+      <div class="card-body" id="evidence"><div class="empty-state">Configure and retrieve evidence.</div></div></div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-3"><div class="card-header">Recommendation</div>
+      <div class="card-body" id="recommendation"><div class="empty-state">No recommendation yet.</div></div></div>
+    <div class="card"><div class="card-header">Validation</div>
+      <div class="card-body" id="validation"><div class="empty-state">—</div></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const qp = new URLSearchParams(location.search);
+if (qp.get("scenario_id")) document.getElementById("scenario_id").value = qp.get("scenario_id");
+if (qp.get("project_id")) document.getElementById("project_id").value = qp.get("project_id");
+
+function cfg(){
+  return {
+    scenario_id: +document.getElementById("scenario_id").value||null,
+    project_id: +document.getElementById("project_id").value||null,
+    as_of_period: document.getElementById("as_of").value||null,
+    problem_type: document.getElementById("problem_type").value||null,
+    problem_description: document.getElementById("problem").value||null,
+    retrieval_mode: document.getElementById("mode").value,
+    top_k: +document.getElementById("topk").value,
+    reranker_enabled: document.getElementById("rerank").checked,
+    citation_enabled: document.getElementById("citation").checked,
+    grounding_enabled: document.getElementById("grounding").checked,
+    abstention_enabled: document.getElementById("abstention").checked,
+  };
+}
+function renderEvidence(items){
+  document.getElementById("evidence").innerHTML = items.length ? items.map(e=>`
+    <div class="evidence-item"><div class="d-flex justify-content-between">
+      <span class="mono">${e.chunk_key}</span>
+      <span class="small">rerank ${fmt(e.rerank_score)} · bm25 ${fmt(e.bm25_score)} · dense ${fmt(e.dense_score)}</span></div>
+      <div class="small text-muted">${e.dataset_type} · period ${e.reporting_period||'—'} · ${e.evidence_category}</div>
+      <pre>${(e.text||'').slice(0,400)}</pre></div>`).join("")
+    : '<div class="empty-state">No evidence retrieved for this configuration/date.</div>';
+}
+async function searchEvidence(){
+  const c=cfg(); document.getElementById("evidence").innerHTML='<span class="spin"></span> retrieving…';
+  const q = c.problem_description || c.problem_type || "project execution";
+  const r = await api("/api/retrieval/search",{method:"POST",body:JSON.stringify({
+    query:q, project_id:c.project_id, as_of_period:c.as_of_period, retrieval_mode:c.retrieval_mode,
+    top_k:c.top_k, reranker_enabled:c.reranker_enabled})});
+  renderEvidence(r.evidence);
+}
+async function generate(){
+  const c=cfg();
+  document.getElementById("recommendation").innerHTML='<span class="spin"></span> generating…';
+  document.getElementById("validation").innerHTML='';
+  const out = await api("/api/recommendations/generate",{method:"POST",body:JSON.stringify(c)});
+  renderEvidence(out.retrieved_evidence);
+  renderRecommendation(out);
+  renderValidation(out.validation, out);
+}
+function renderRecommendation(out){
+  const el=document.getElementById("recommendation");
+  if(out.abstained){ el.innerHTML=`<div class="alert alert-warning"><b>Abstained.</b> ${out.abstention_reason||''}</div>
+    <div class="small text-muted">Generator: ${out.generator_backend} (${out.generation_mode})</div>`; return; }
+  el.innerHTML = `<p><b>Problem:</b> ${out.problem_summary||''}</p>
+    <p class="small"><b>Evidence:</b> ${out.evidence_summary||''}</p>
+    ${out.recommended_actions.map(a=>`<div class="evidence-item">
+      <b>${a.action}</b><div class="small">
+      <span class="badge bg-dark">${a.category||''}</span>
+      <span class="badge bg-danger">${a.priority}</span>
+      <span class="badge bg-secondary">${a.responsible_role||''}</span>
+      ${a.requires_human_approval?'<span class="badge bg-warning text-dark">approval required</span>':''}</div>
+      <div class="small mt-1"><i>Rationale:</i> ${a.rationale||''}</div>
+      <div class="small"><i>Cites:</i> ${(a.supporting_evidence_ids||[]).map(x=>`<span class="mono">${x}</span>`).join(', ')||'—'}</div>
+      ${(a.assumptions||[]).length?`<div class="small text-muted"><i>Assumptions:</i> ${a.assumptions.join('; ')}</div>`:''}
+      </div>`).join("")}
+    ${(out.limitations||[]).length?`<div class="small text-muted mt-2">Limitations: ${out.limitations.join('; ')}</div>`:''}
+    <div class="small text-muted mt-1">Generator: ${out.generator_backend} (${out.generation_mode}) ·
+      latency ${out.latency.total_ms}ms · <a href="/recommendations/${out.result_id}">audit →</a></div>`;
+}
+function renderValidation(v, out){
+  const g=v.grounding, c=v.citations;
+  document.getElementById("validation").innerHTML = `
+    <div>Citations: <b>${c.valid}/${c.total}</b> valid (resolve rate ${pct(c.resolve_rate)})</div>
+    <div>Grounding: <b>${g.supported_claims}/${g.total_claims}</b> supported ·
+      ${g.contradictions} contradictions <span class="text-muted">[${g.backend}]</span></div>
+    ${g.results.map(r=>`<div class="small ${r.supported?'supported':(r.label==='contradiction'?'unsupported':'neutral')}">
+      ${r.supported?'✔':r.label==='contradiction'?'✖':'○'} ${r.claim.slice(0,90)} (${r.label} ${fmt(r.score)})</div>`).join("")}
+    ${v.rule_warnings.length?`<div class="alert alert-warning py-1 mt-2 small">${v.rule_warnings.join('<br>')}</div>`:''}
+    <div class="mt-2"><span class="badge bg-${out.abstained?'warning text-dark':'success'}">
+      ${out.abstained?'ABSTAINED':'EMITTED'}</span></div>`;
+}
+</script>
+{% endblock %}

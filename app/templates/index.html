@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-3" id="stat-cards"></div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header">Execution-Scenario Distribution</div>
+      <div class="card-body"><div class="chart-box"><canvas id="scenarioChart"></canvas></div></div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100"><div class="card-header">Projects by Current Phase</div>
+      <div class="card-body"><div class="chart-box"><canvas id="phaseChart"></canvas></div></div></div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-12">
+    <div class="card"><div class="card-header">Research Integrity Indicators</div>
+      <div class="card-body" id="integrity"></div></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const STAT_DEFS = [
+  ["total_datasets","Datasets"],["total_records","Imported Records"],["unique_projects","Unique Projects"],
+  ["unique_fms","Unique FMS IDs"],["schedule_history_records","Schedule History"],
+  ["budget_history_records","Budget History"],["indexed_chunks","Indexed Evidence"],
+  ["scenarios","Scenarios"],["benchmark_scenarios","Benchmark Scenarios"],
+  ["recommendations","Recommendations"],["experiment_runs","Experiment Runs"],
+];
+async function load() {
+  const status = await api("/api/system/status");
+  const s = status.stats;
+  const cards = document.getElementById("stat-cards");
+  cards.innerHTML = STAT_DEFS.map(([k,l]) =>
+    `<div class="col-6 col-md-3 col-xl-2"><div class="stat-card">
+      <div class="val">${fmt(s[k]||0)}</div><div class="lbl">${l}</div></div></div>`).join("");
+
+  const integ = document.getElementById("integrity");
+  const cv = s.citation_validation_rate, uc = s.unsupported_claim_rate, ab = s.abstention_rate;
+  integ.innerHTML = `
+    <div class="row text-center">
+      <div class="col-md-4"><div class="val h4">${cv===null?'—':pct(cv)}</div>
+        <div class="lbl">Citation Validation Rate</div></div>
+      <div class="col-md-4"><div class="val h4 ${uc>0.3?'unsupported':''}">${uc===null?'—':pct(uc)}</div>
+        <div class="lbl">Unsupported-Claim Rate</div></div>
+      <div class="col-md-4"><div class="val h4">${ab===null?'—':pct(ab)}</div>
+        <div class="lbl">Abstention Rate</div></div>
+    </div>
+    <p class="text-muted small mt-3 mb-0">All figures are computed from actual database records.
+    Empty metrics indicate no recommendations/experiments have been run yet — no placeholder values are shown.</p>`;
+
+  // Charts
+  const dist = await api("/api/scenarios?limit=1").catch(()=>null);
+  const sc = await fetch("/api/system/status").then(r=>r.json());
+  // scenario distribution via dedicated endpoint
+  const sd = await api("/api/research-results/summary").catch(()=>null);
+  loadScenarioChart();
+  loadPhaseChart();
+}
+
+async function loadScenarioChart() {
+  const r = await api("/api/scenarios?limit=1000");
+  const counts = {};
+  (r.scenarios||[]).forEach(x => counts[x.problem_type] = (counts[x.problem_type]||0)+1);
+  const labels = Object.keys(counts);
+  if (!labels.length) { document.getElementById("scenarioChart").parentElement.innerHTML =
+    '<div class="empty-state">No scenarios detected yet. Run the pipeline from Datasets.</div>'; return; }
+  barChart(document.getElementById("scenarioChart"), labels,
+    [{label:"Scenarios", data:labels.map(l=>counts[l]), backgroundColor: PALETTE}],
+    {plugins:{legend:{display:false}}});
+}
+async function loadPhaseChart() {
+  const r = await api("/api/projects?limit=500");
+  const counts = {};
+  (r.projects||[]).forEach(p => { const k=p.phase||"Unknown"; counts[k]=(counts[k]||0)+1; });
+  const labels = Object.keys(counts);
+  if (!labels.length) { document.getElementById("phaseChart").parentElement.innerHTML =
+    '<div class="empty-state">No projects imported yet.</div>'; return; }
+  new Chart(document.getElementById("phaseChart"), {type:"doughnut",
+    data:{labels, datasets:[{data:labels.map(l=>counts[l]), backgroundColor:PALETTE}]},
+    options:{responsive:true, maintainAspectRatio:false}});
+}
+load().catch(e => showAlert(e.message, "danger"));
+</script>
+{% endblock %}
