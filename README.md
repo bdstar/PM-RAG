@@ -88,6 +88,10 @@ tests/                    pytest unit + integration suite
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
+# Activate Virtual Environment(Windos)
+Command Prompt (cmd)	.\.venv\Scripts\activate.bat
+PowerShell	.\.venv\Scripts\Activate.ps1
+
 # 2. Install dependencies
 pip install -r requirements.txt
 
